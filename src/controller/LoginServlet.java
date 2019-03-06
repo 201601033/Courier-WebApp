@@ -38,6 +38,7 @@ public class LoginServlet extends HttpServlet{
 		String password = request.getParameter("password");
 		boolean rememberedUser = (request.getParameterValues("remember_me") != null);
 		Cookie loginCookie = null;
+		if(request.getCookies() != null) {
 		for(Cookie c : request.getCookies())
 		{
 			if (c.getName().equals("userlogged"))
@@ -46,7 +47,12 @@ public class LoginServlet extends HttpServlet{
 				break;
 			}
 		}
-		
+		}
+		else {
+			RequestDispatcher rd = request.getRequestDispatcher("index.jsp");
+			
+			rd.forward(request, response);
+		}
 		if(loginCookie != null)
 		{
 			
