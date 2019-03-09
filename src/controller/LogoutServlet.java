@@ -29,11 +29,18 @@ public class LogoutServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		Cookie userLogged = CookieHelper.getCookie(request.getCookies(), "userlogged");
+		Cookie emailLogged = CookieHelper.getCookie(request.getCookies(), "emaillogged");
 		if(userLogged != null)
 		{
 			//for deletion
 			userLogged.setMaxAge(0);
 			response.addCookie(userLogged);
+		}
+		if(emailLogged != null)
+		{
+			//for deletion
+			emailLogged.setMaxAge(0);
+			response.addCookie(emailLogged);
 		}
 		request.getRequestDispatcher("index.jsp").forward(request, response);
 
