@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 06, 2019 at 12:16 PM
+-- Generation Time: Mar 09, 2019 at 05:34 PM
 -- Server version: 10.1.29-MariaDB
 -- PHP Version: 7.2.0
 
@@ -21,6 +21,22 @@ SET time_zone = "+00:00";
 --
 -- Database: `courierportaldb`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `announcements`
+--
+
+CREATE TABLE `announcements` (
+  `announcementID` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `announcementBody` varchar(255) NOT NULL,
+  `file` longblob,
+  `tags` varchar(255) NOT NULL,
+  `dateposted` date NOT NULL,
+  `timeposted` time NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -64,12 +80,19 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`email`, `password`, `firstname`, `lastname`, `profileImage`, `roleID`) VALUES
 ('201901023@iacademy.edu.ph', 'somepassword', 'Some', 'User', NULL, 1),
+('it.department@iacademy.edu.ph', 'activedirectory', 'IT', 'Department', NULL, 4),
 ('james.gosling@iacademy.edu.ph', 'javaislife', 'James', 'Gosling', NULL, 2),
 ('stevejobs@iacademy.edu.ph', 'appleornothing', 'Steve', 'Jobs', NULL, 3);
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `announcements`
+--
+ALTER TABLE `announcements`
+  ADD PRIMARY KEY (`announcementID`);
 
 --
 -- Indexes for table `roleid`
@@ -82,6 +105,16 @@ ALTER TABLE `roleid`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`email`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `announcements`
+--
+ALTER TABLE `announcements`
+  MODIFY `announcementID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
