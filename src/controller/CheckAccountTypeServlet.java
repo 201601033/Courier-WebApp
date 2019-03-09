@@ -1,19 +1,29 @@
 package controller;
 
 import java.io.IOException;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Cookie;
 import utility.CookieHelper;
+import model.UserBean;
+import java.sql.SQLException;
 /**
- * Servlet implementation class LogoutServlet
+ * Servlet implementation class CheckAccountTypeServlet
  */
-@WebServlet("/logout.action")
-public class LogoutServlet extends HttpServlet {
+@WebServlet("/checkaccounttype.action")
+public class CheckAccountTypeServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @see Servlet#init(ServletConfig)
+	 */
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+		UserBean.initializeConn();
+	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -28,22 +38,18 @@ public class LogoutServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		Cookie userLogged = CookieHelper.getCookie(request.getCookies(), "userlogged");
-		//Cookie emailLogged = CookieHelper.getCookie(request.getCookies(), "emaillogged");
-		if(userLogged != null)
+		try {
+		UserBean userbean = UserBean.retrieveUser(CookieHelper.getCookie(request.getCookies(), "userlogged").getValue());
+		if(userbean.getRoleID() == 2 || userbean.getRoleID() == 3)
 		{
-			//for deletion
-			userLogged.setMaxAge(0);
-			response.addCookie(userLogged);
+			request.setAttribute("userlogged", userbean);
+			response.sendRedirect("newannouncement.jsp");
 		}
-	/*	if(emailLogged != null)
+		}catch(SQLException sqle)
 		{
-			//for deletion
-			emailLogged.setMaxAge(0);
-			response.addCookie(emailLogged);
-		}*/
-		request.getRequestDispatcher("index.jsp").forward(request, response);
-
+			System.err.println(sqle.getMessage());
+			response.sendRedirect("landingpage.jsp");
+		}
 	}
 
 }

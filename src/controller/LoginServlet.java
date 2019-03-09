@@ -2,11 +2,11 @@ package controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
@@ -25,6 +25,12 @@ public class LoginServlet extends HttpServlet{
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
+	public void init(ServletConfig config)throws ServletException{
+		//required method to call if there is the ServletConfig
+		super.init(config);		
+		UserBean.initializeConn();
+		AnnouncementBean.initializeConn();
+	}
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doPost(request, response);
@@ -39,14 +45,7 @@ public class LoginServlet extends HttpServlet{
 		boolean rememberedUser = (request.getParameterValues("remember_me") != null);
 		Cookie loginCookie = null;
 		if(request.getCookies() != null) {
-		for(Cookie c : request.getCookies())
-		{
-			if (c.getName().equals("userlogged"))
-			{
-				loginCookie = c;
-				break;
-			}
-		}
+			loginCookie = CookieHelper.getCookie(request.getCookies(), "userlogged");
 		}
 		else {
 			RequestDispatcher rd = request.getRequestDispatcher("index.jsp");
@@ -57,39 +56,49 @@ public class LoginServlet extends HttpServlet{
 		{
 			
 			response.addCookie(loginCookie);
+			try {
+			UserBean loggedUser = UserBean.retrieveUser(loginCookie.getValue());
+			request.setAttribute("userlogged", loggedUser);
+			}catch(SQLException sqle)
+			{
+				response.sendRedirect("index.jsp");
+			}
+		//	response.addCookie(emailCookie);
 			RequestDispatcher rd = request.getRequestDispatcher("landingpage.jsp");
 			
 			rd.forward(request, response);
 		}
-		else {
+		if(loginCookie == null) {
 		
 			try {
-				UserBean loggedUser = new UserBean();
-			
-				PreparedStatement stmt = UserBean.getConnection().prepareStatement("Select * from users where `email` = ? AND `password` = ?");
-				stmt.setString(1, email);
-				stmt.setString(2, password);
-				ResultSet rs = stmt.executeQuery();
-			if(rs.next())
+				boolean isValidated = UserBean.validation(email, password);
+			if(isValidated)
 			{
-				loggedUser.validation(email, password);
-					loginCookie = new Cookie("userlogged", loggedUser.getFirstName());
+				UserBean loggedUser = UserBean.retrieveUser(email);
+				System.out.println(loggedUser.getEmail());
+				loginCookie = new Cookie("userlogged", loggedUser.getEmail());
 					if(rememberedUser)
 					{
 					loginCookie.setMaxAge(60 * 60 * 24 *365 * 5);
+				//	emailCookie.setMaxAge(60*60*24*365*5);
 					}
 					else
 					{
 						loginCookie.setMaxAge(-1);
+					//	emailCookie.setMaxAge(-1);
 					}
+					AnnouncementBean announcementBean = new AnnouncementBean();
+					ResultSet announcements = announcementBean.getAllAnnouncements();
+					request.setAttribute("announcements", announcements);
 					response.addCookie(loginCookie);
-					request.setAttribute("userlogged", loggedUser);
-				//	RequestDispatcher requestDispatcher = request.getRequestDispatcher("landingpage.jsp");
+			//		response.addCookie(emailCookie);
+			//		request.setAttribute("userlogged", loggedUser);
+			//	RequestDispatcher requestDispatcher = request.getRequestDispatcher("landingpage.jsp");
 					
-			//		requestDispatcher.forward(request, response);
-					response.sendRedirect("landingpage.jsp");
-				
+				//	requestDispatcher.forward(request, response);
+				response.sendRedirect("landingpage.jsp");
 					System.out.println(loginCookie.getValue());
+				//	System.out.println(emailCookie.getValue());
 					System.out.println(rememberedUser);
 			}
 			else {
@@ -98,6 +107,7 @@ public class LoginServlet extends HttpServlet{
 				out.println("<h2 font = 'red'>Email/Password incorrect!</h2>");
 				requestDispatcher.forward(request, response);
 			}
+		
 			}catch(SQLException sqle)
 			{
 				getServletContext().log(sqle.getMessage());
