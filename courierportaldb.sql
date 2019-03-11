@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 09, 2019 at 05:34 PM
+-- Generation Time: Mar 11, 2019 at 10:13 AM
 -- Server version: 10.1.29-MariaDB
 -- PHP Version: 7.2.0
 
@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `announcements` (
-  `announcementID` int(11) NOT NULL,
+  `announcementID` int(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `announcementBody` varchar(255) NOT NULL,
   `file` longblob,
@@ -37,6 +37,13 @@ CREATE TABLE `announcements` (
   `dateposted` date NOT NULL,
   `timeposted` time NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `announcements`
+--
+
+INSERT INTO `announcements` (`announcementID`, `email`, `announcementBody`, `file`, `tags`, `dateposted`, `timeposted`) VALUES
+(14, 'stevejobs@iacademy.edu.ph', 'Punyeta', NULL, 'SE', '2019-03-10', '00:49:38');
 
 -- --------------------------------------------------------
 
@@ -114,7 +121,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `announcements`
 --
 ALTER TABLE `announcements`
-  MODIFY `announcementID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `announcementID` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
