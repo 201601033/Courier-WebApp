@@ -18,6 +18,7 @@ public class UserBean {
 	private Blob profileImage;
 	private int roleID;
 	private ServletContext context;
+	private static Connection connection;
 	/*
 	 *  1 - student
 	 *  2 - professor
@@ -87,8 +88,7 @@ public class UserBean {
 	public void setServletContext(ServletContext servletContext) {
 		this.context = servletContext;
 	}
-	public static Connection getConnection() {
-		Connection connection = null;
+	private static void getConnection() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/courierportaldb", "root", "");
@@ -100,34 +100,37 @@ public class UserBean {
 		}catch(SQLException sqle) {
 		//	context.log(sqle.getMessage());
 		}
-		return connection;
 	}
-	public boolean validation(String email, String password)throws SQLException{
-			Connection connection = getConnection();
+	public static void initializeConn() {
+		if(connection == null)
+		{
+			getConnection();
+		}
+	}
+	public static boolean validation(String email, String password)throws SQLException{
 			PreparedStatement ps = connection.prepareStatement("select * from users where email = ? and password = ?");
 			boolean isAuthenticated = false;
 			//UserBean authenticatedUser = null;
 			ps.setString(1, email);
 			ps.setString(2, password);
 			ResultSet rs = ps.executeQuery();
-			if(rs.next())
-			{
-				this.setEmail(rs.getString("email"));
+		
+				/*this.setEmail(rs.getString("email"));
 				this.setPassword(rs.getString("password"));
 				this.setFirstName(rs.getString("firstname"));
 				this.setLastName(rs.getString("lastname"));
 				this.setProfileImage(rs.getBlob("profileImage"));
-				this.setRoleID(rs.getInt("roleid"));
-				isAuthenticated = true;
+				this.setRoleID(rs.getInt("roleid"));*/
+				isAuthenticated = rs.next();
 				//System.out.println(isAuthenticated);
-			}
+		
+			System.out.println(isAuthenticated);
 			return isAuthenticated;
+			
 			
 	}
 	public  UserBean convertRowToUser(String email, String password) throws SQLException{
 		UserBean user = null;
-		try {
-		Connection connection = getConnection();
 		PreparedStatement ps = connection.prepareStatement("select * from users where email = ? and password = ?");
 		ps.setString(1, email);
 		ps.setString(2,password);
@@ -143,10 +146,38 @@ public class UserBean {
 			user.setRoleID(rs.getInt("roleid"));
 			System.out.println(user.getEmail());
 		}
-		}catch(SQLException sqle)
-		{
-			context.log(sqle.getMessage());
-		}
+		connection.close();
 		return user;
+	}
+	public static UserBean retrieveUser(String email)throws SQLException {
+		UserBean retrievedUser = null;
+		ResultSet record = null;
+		String sql = "select * from users where email= ?";
+		Connection conn = connection;
+		if(conn == null)
+		{
+			initializeConn();
+		}
+		try {
+			PreparedStatement pstmnt = 
+				conn.prepareStatement(sql);
+			
+			pstmnt.setString(1, email);
+			record = pstmnt.executeQuery();
+			
+			while (record.next()) {
+				retrievedUser = new UserBean();
+				retrievedUser.setEmail(record.getString("email"));
+				retrievedUser.setFirstName(record.getString("firstname"));
+				retrievedUser.setLastName(record.getString("lastname"));
+				retrievedUser.setProfileImage(record.getBlob("profileImage"));
+				retrievedUser.setRoleID(record.getInt("roleID"));
+				System.out.println("User found!");
+			}	
+		} catch (SQLException sqle) {
+			System.err.println(sqle.getMessage());
+			System.err.println("User not found!");
+		}
+		return retrievedUser;
 	}
 }

@@ -1,50 +1,48 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"
-    import = "utility.CookieHelper, model.UserBean, java.sql.ResultSet, model.AnnouncementBean"
-    %>
-<!--jsp:useBean id="userlogged" class = "model.UserBean" scope = "request"/-->
-<!--jsp:useBean id="announcements" type="java.sql.ResultSet" scope="request"/-->  
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+    pageEncoding="ISO-8859-1" import = "java.util.ArrayList, utility.CookieHelper" %>
+<% ArrayList<String> tags = new ArrayList<String>();
+	tags.add("General");
+	tags.add("Computing");
+	tags.add("Design");
+	tags.add("Business");
+	tags.add("SE");
+	tags.add("GD");
+	tags.add("WD");
+	tags.add("Animation");
+	tags.add("MMA");
+	tags.add("FD");
+	tags.add("BA");
+	tags.add("FM");
+	
+%>
+<%	
+	String str = null;
+	Cookie userCookie = CookieHelper.getCookie(request.getCookies(), "userlogged");
+	str = userCookie.getValue();
+%>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Welcome!</title>
+    <title>CPi: Editing Announcement</title>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+
 <style>
- @import url(https://fonts.googleapis.com/css?family=Raleway);
+
+
+/* Smaller menu when on small screen
+ All padding and margin are in em, so they will scale as well */
+
+/* NAVIGATOR BAR */
+  @import url(https://fonts.googleapis.com/css?family=Raleway);
   h2 {
     vertical-align: center;
     text-align: center;
   }
-  .display-1 {
-  font-size: 6rem;
-  font-weight: 300;
-  line-height: 1.2;
-}
 
-.display-2 {
-  font-size: 5.5rem;
-  font-weight: 300;
-  line-height: 1.2;
-}
-
-.display-3 {
-  font-size: 4.5rem;
-  font-weight: 300;
-  line-height: 1.2;
-}
-
-.display-4 {
-  font-size: 3.5rem;
-  font-weight: 300;
-  line-height: 1.2;
-}
-.my-4 {
-  margin-top: 1.5rem !important;
-}
   html, body {
     margin: 0;
     height: 100%;
@@ -276,16 +274,18 @@ body
       resize: none;
     }
 
-</style>   
+</style>
 </head>
+
 <body>
-<% UserBean userlogged = UserBean.retrieveUser(CookieHelper.getCookie(request.getCookies(), "userlogged").getValue());
-	ResultSet announcements = AnnouncementBean.getAllAnnouncements();%>
- 
-<section class="top-nav">
+
+    <section class="top-nav">
         <div class="barrierText">
+                <!-- USER PROFILE PICTURE -->
+                <!-- <a href> IS THE PROFILE OF USER -->
                 <a href="#"><!--img src="C:\Users\Christian\Pictures\penguin.jpeg"
                     alt="Courier Portal: iACADEMY" width="40" height="40" hspace="15" class="profilePicture"-->Courier Portal: iACADEMY</a>
+
         </div>
         <input id="menu-toggle" type="checkbox" />
         <label class='menu-button-container' for="menu-toggle">
@@ -296,22 +296,16 @@ body
         <!-- TOP NAVIGATOR -->
         <ul class="menu">
           <a href="landingpage.jsp"><li class="textFix"><font color="white">Home</a></li></font>
-          <%if (userlogged.getRoleID() == 2 || userlogged.getRoleID() == 3){ %>
           <a href="checkaccounttype.action"><li class="textFix"><font color="white">Compose Announcement</a></li></font>
-          <%}%>
-          <a href="#"><li class="textFix"><font color="white">Inbox</a></li></font>
-          <a href="#"><li class="textFix"><font color="white">Notifications</a></li></font>
-          <a href="#"><li class="textFix"><font color="white">Others</a></li></font>
+          <a href="homePage_sender.html"><li class="textFix"><font color="white">Inbox</a></li></font>
+          <a href="homePage_sender.html"><li class="textFix"><font color="white">Notifications</a></li></font>
+          <a href="homePage_sender.html"><li class="textFix"><font color="white">Others</a></li></font>
           <li class = "textFix"><form class = "form-inline my-2 my-lg-0">
             <input class = "form-control mr-sm-2" type "text">
             <button class = "btn btn-secondary my-2 my-sm-0" type = "submit">Search</button>
             </form>
           </li>
-         <li class="textFix">
-         <form action = "logout.action" method = "post">
-         	<button class = "btn btn-secondary my-2 my-sm-0" type = "submit">Sign Out</button>
-         </form>
-         </li>
+          <a href="logout.action"><li class="textFix"><font color="white">Sign Out</a></li></font>
         </ul>
       </section>
 
@@ -324,33 +318,26 @@ body
     </div>
 
     <!-- USER PROFILE PIC (Center) -->
-    <div class="container"><div class="dpBox">
-   
-    
-    <img src="images/default.png"
-      alt="ProfileImage" class="dpBoxPicFix">
-      </div>
-      <h2>Welcome, <%=userlogged.getFirstName() %></h2></div>
-    
-    <%while(announcements.next()){ %>
-    <div class ="jumbotron">
-    <div class="schoolLogo">
-                    <a href="#"><img src="images/default.png"
-                        alt="Courier Portal: iACADEMY" class="schoolLogo"></a>
-            </div>
-    <h1 class = "display-3"><%="[" + announcements.getString("tags") + "] " + announcements.getString("name")%></h1>
-   	<h1 class = 'display-3'><a href = 'viewannouncement.action?id=<%=announcements.getString("id")%>'><%="[ " + announcements.getString("tags") + "] " + announcements.getString("name") %></a></h1>
-    <p><%=announcements.getString("announcementBody") %></p>
-    <hr class = "my.4"/>
-    <p>Posted:<%=" " + announcements.getDate("datePosted") + " " + announcements.getTime("timePosted") %></p>
-    <%if (announcements.getString("email").equals(userlogged.getEmail())) { %>
-	    <form action = "edditannouncement.jsp" method = "post">
-	    	<button class = "btn btn-secondary my-2 my-sm-0" type = "submit">Edit</button>
-	    </form>
-    <%} %>
-    </div>
-    <%} %>
-    
+    <div class="container"><div class="dpBox"><img src="C:\Users\Christian\Pictures\penguin.jpeg"
+      alt="Courier Portal: iACADEMY" class="dpBoxPicFix"></div></div>
 
+	<form action = "editannouncement.action" method = "post">
+    <!-- TEXT AREA -->
+    <div class="container"><textarea placeholder = "Previous announcement" class="textFix" required="required" name = "announcementbody"></textarea>
+    </div>
+    <div class = "container">
+    <%for(int i = 0; i < tags.size(); i++){ %>
+     <input type = checkbox name = "tagged" value = <%=tags.get(i) %>><%=tags.get(i) %>
+     <br>
+     <%} %>
+    </div>
+
+    <!-- UPLOAD IMG/FILE && CUSTOM SYMBOL ANNOUNCEMENT (Icons are missing, but that's their positions na hehe) -->
+    <input type = "file" name = "file">
+    <div class="container">
+    <button class = "btn btn-secondary my-2 my-sm-0" type = "submit">Post!</button>
+    </div>
+    </form>
+     
 </body>
 </html>
